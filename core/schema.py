@@ -1,20 +1,36 @@
-import graphene
-from graphene_django import DjangoObjectType
+from core.mutations import ClockIn, ClockOut
+from core.objectTypes import ClockType, ClockedHoursType
 
 from core.models import Clock
 
-class ClockType(DjangoObjectType):
-    class Meta:
-        model = Clock
+import graphene
 
 class Query(graphene.ObjectType):
-    all_clocks = graphene.List(ClockType)
+    current_clock = graphene.Field(ClockType)
+    clocked_hours = graphene.Field(ClockedHoursType)
 
-    def resolve_all_clocks(self, info):
+    def resolve_current_clock(self, info):
         user = info.context.user
         if user.is_anonymous:
             raise Exception('Authentication credentials were not provided')
-        return Clock.objects.all()
+
+        # Get the most recent clocked_in for the user
+        clock = Clock.objects.filter(user=user).order_by('-clocked_in').first()
+
+        # return clock if clock out is None
+        if not clock or clock.clocked_out:
+            return None
+
+        return clock
+
+    def resolve_clocked_hours(self, info):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception('Authentication credentials were not provided')
+        return ClockedHoursType()
+
+
 
 class Mutation(graphene.ObjectType):
-    pass
+    clock_in = ClockIn.Field()
+    clock_out = ClockOut.Field()

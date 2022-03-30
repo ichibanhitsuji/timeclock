@@ -6,6 +6,7 @@ class Clock(models.Model):
     """
     clocked_in = models.DateTimeField(auto_now_add=True)
     clocked_out = models.DateTimeField(null=True, blank=True)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     def __str__(self):
-        return self.id
+        return str(self.id)
 
