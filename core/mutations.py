@@ -24,7 +24,7 @@ class ClockIn(graphene.Mutation):
             new_clock.save()
             return ClockIn(clock=new_clock)
         else:
-            return None
+            raise Exception('You have already clocked in')
 
 
 
@@ -45,7 +45,7 @@ class ClockOut(graphene.Mutation):
         clock = Clock.objects.filter(user=user).order_by('-clocked_in').first()
 
         if not clock or clock.clocked_out:
-            return None
+            raise Exception('You have not clocked in yet')
         else:
             clock.clocked_out = datetime.now()
             clock.save()
