@@ -1,0 +1,5 @@
+Django>=4.0.3
+freezegun>=1.2.1
+graphene>=2.1.9
+graphene-django>=2.15.0
+django-graphql-jwt>=0.3.4
