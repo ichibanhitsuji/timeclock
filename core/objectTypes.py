@@ -44,13 +44,8 @@ def sum_clocked_hours(user, start_date):
             clocked_out__isnull=True))
 
     today_clocks = list(map(lambda clock: (
-        clock.clocked_in if clock.clocked_in.date() >= start_date.date() else start_date,
-        clock.clocked_out or datetime.now()),
-                            clocks))
-
-    # convert all the date to a naive format
-    today_clocks = list(
-        map(lambda clock: (clock[0].replace(tzinfo=None), clock[1].replace(tzinfo=None)), today_clocks))
+        clock.clocked_in.replace(tzinfo=None) if clock.clocked_in.date() >= start_date.date() else start_date.replace(tzinfo=None),
+        clock.clocked_out.replace(tzinfo=None) if clock.clocked_out else datetime.now().replace(tzinfo=None)), clocks))
 
     # calculate the sum of the timedelta of all the clocked_in and clocked_out for each tuple
     s = sum([(t[1] - t[0]).total_seconds() for t in today_clocks])
